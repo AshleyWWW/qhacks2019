@@ -16,7 +16,7 @@ def interpolate_days(dff, dates):
     span = pandas.date_range(dff[dates].min(), dff[dates].max(), freq="D")
     expanded = pandas.DataFrame(index=span.copy()).interpolate("time", columns=dates)
     expanded[dates] = expanded.index
-    return pandas.merge(dff, expanded, how="outer", on=[dates])
+    return pandas.merge(dff, expanded, how="outer", on=[dates], sort=True)
 
 if __name__ == "__main__":
     df = pandas.DataFrame({"time": [datetime.datetime(2000, 1, 1),
