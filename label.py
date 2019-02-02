@@ -1,4 +1,4 @@
-import pandas
+import pandas, datetime
 
 def create_label(dff, current, previous, label):
     dff = dff.assign(label=2) # create a new col
@@ -12,7 +12,22 @@ def create_label(dff, current, previous, label):
 def mov_percent(prev, cur):
     return (cur - prev) / (prev + 10e-10)
 
+def interpolate_days(dff, dates):
+    span = pandas.date_range(dff[dates].min(), dff[dates].max(), freq="D")
+    expanded = pandas.DataFrame(index=span.copy()).interpolate("time", columns=dates)
+    expanded[dates] = expanded.index
+    print(expanded)
+    return pandas.merge(dff, expanded, how="outer", on=[dates])
+
 if __name__ == "__main__":
-    df = pandas.DataFrame({"time": [1, 2, 3, 1, 2, 3],"assetCode": ["a", "a", "a", "b", "b", "b"],
-                           "current":[1,2,3,4,5,6],"past1":[0,9,8,7,6,6],"past2":[3,4,5,6,7,8]})
-    print(create_label(df, "current", "past1", "label"))
+    df = pandas.DataFrame({"time": [datetime.datetime(2000, 1, 1),
+                                    datetime.datetime(2000, 1, 3),
+                                    datetime.datetime(2000, 2, 1),
+                                    datetime.datetime(2000, 1, 1),
+                                    datetime.datetime(2000, 1, 3),
+                                    datetime.datetime(2000, 2, 1)],
+                           "assetCode": ["a", "a", "a", "b", "b", "b"],
+                           "current":[1,2,3,4,5,6],"past1":[0,9,8,7,6,6],
+                           "past2":[3,4,5,6,7,8]})
+    print(df)
+    print(interpolate_days(df, "time"))
