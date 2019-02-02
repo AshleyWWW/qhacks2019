@@ -16,7 +16,6 @@ def interpolate_days(dff, dates):
     span = pandas.date_range(dff[dates].min(), dff[dates].max(), freq="D")
     expanded = pandas.DataFrame(index=span.copy()).interpolate("time", columns=dates)
     expanded[dates] = expanded.index
-    print(expanded)
     return pandas.merge(dff, expanded, how="outer", on=[dates])
 
 if __name__ == "__main__":
@@ -29,5 +28,4 @@ if __name__ == "__main__":
                            "assetCode": ["a", "a", "a", "b", "b", "b"],
                            "current":[1,2,3,4,5,6],"past1":[0,9,8,7,6,6],
                            "past2":[3,4,5,6,7,8]})
-    print(df)
     print(interpolate_days(df, "time"))
