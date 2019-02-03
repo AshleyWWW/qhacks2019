@@ -6,7 +6,6 @@ This is a temporary script file.
 """
 import datetime
 import pandas as pd
-import numpy as np
 from datetime import datetime 
 
 def read_csv(filename, values):
@@ -122,7 +121,7 @@ def main():
     #eliminate time from date time
     news_dataframe = time_to_date(news_dataframe, 'time')
     mkt_dataframe = time_to_date(mkt_dataframe, 'time')
-    print(mkt_dataframe)
+
     #concatenate strings and sort by asset and time
     news_dataframe = combine_strings(news_dataframe, 'time', 'assetName', 'headline')
     news_dataframe = assetsort(news_dataframe, 'assetName', 'time')
@@ -130,18 +129,13 @@ def main():
     #interpolate time column in each dataframe 
     newsdf = shift_asset_sensitive(news_dataframe,'assetName','headline','time')
     mktdf = shift_asset_sensitive(mkt_dataframe,'assetName','close','time')
-    print(newsdf)
-    #label calculation
     mkt_dataframe = create_label(mktdf,'close', 'closePast1', 'label')
-#    print(news_dataframe.iloc[:,0:2])
-#    mkt_dataframe = read_csv(input('path to marketdatafame: '), input('name of columns, space delimited: ').split())
-#    news_dataframe = shift(news_dataframe, 'headline')
-#    mkt_dataframe = shift(mkt_dataframe, input('name of column to be shifted: '))
-#    news_dataframe = elim_rows(news_dataframe)
-#    news_dataframe.to_csv('sampleNews.csv', index=False)
-#    mkt_dataframe = elim_rows(mkt_dataframe)
-#    print(mergedf(news_dataframe, mkt_dataframe, input('name of column to find merge criteria: ')))
+   #merge file
+    merged = mergedf(newsdf, mkt_dataframe, ['time', 'assetName'])
     
+    #remove nan rows
+    merged = elim_rows(merged)
+    merged.to_csv('sampleTest.csv', index=False)   
     
 
 if __name__=="__main__":
