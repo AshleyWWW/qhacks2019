@@ -15,15 +15,6 @@ tpp.set_options(tpp.OPT.RESERVED, tpp.OPT.EMOJI, tpp.OPT.SMILEY, tpp.OPT.URL, tp
 #with open("tickers_without_$.pkl","rb") as tickers_pickle:
 #    all_tickers = pickle.load(tickers_pickle)
 
-ticker_folders = ['XOM', 'RDS-B', 'PTR', 'CVX', 'TOT', 'BP', 'BHP', 'SNP', 'SLB', 'BBL', 'AAPL', 'PG', 'BUD', 'KO',
-                  'PM', 'TM', 'PEP', 'UN', 'UL', 'MO', 'JNJ', 'PFE', 'NVS', 'UNH', 'MRK', 'AMGN', 'MDT', 'ABBV', 'SNY',
-                  'CELG', 'AMZN', 'BABA', 'WMT', 'CMCSA', 'HD', 'DIS', 'MCD', 'CHTR', 'UPS', 'PCLN', 'NEE', 'DUK', 'D',
-                  'SO', 'NGG', 'AEP', 'PCG', 'EXC', 'SRE', 'PPL', 'IEP', 'HRG', 'CODI', 'REX', 'SPLP', 'PICO', 'AGFS',
-                  'BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA', 'GE', 'MMM', 'BA', 'HON', 'UTX',
-                  'LMT', 'CAT', 'GD', 'DHR', 'ABB', 'GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC',
-                  'CSCO']
-all_tickers = [i.lower() for i in ticker_folders]
-
 def replaceMultiStopMark(text):
     """ Replaces repetitions of stop marks """
     text = re.sub(r"(\.)\1+", ' . ', text)
@@ -74,7 +65,22 @@ def self_clean(text_list):
 def lag(start_date, gap):
     #start_date is type of pandas.Timestamp
     return start_date - timedelta(gap)
-
+###################################################################################
+    #fill in with proper parameters. see original python file for example
+import dataframe_preprocessing as preprocessing_step
+preprocessing_step.shift_asset_sensitive(df1,'assetName','value','time',3)
+preprocessing_step.shift_asset_sensitive(df2,'assetName','value','time',1)
+preprocessing_step.mergedf(newsdf, mkt_dataframe, ['time', 'assetName'])
+preprocessing_step.elim_rows(merged, "label", "assetName")
+###################################################################################
+ticker_folders = ['XOM', 'RDS-B', 'PTR', 'CVX', 'TOT', 'BP', 'BHP', 'SNP', 'SLB', 'BBL', 'AAPL', 'PG', 'BUD', 'KO',
+                  'PM', 'TM', 'PEP', 'UN', 'UL', 'MO', 'JNJ', 'PFE', 'NVS', 'UNH', 'MRK', 'AMGN', 'MDT', 'ABBV', 'SNY',
+                  'CELG', 'AMZN', 'BABA', 'WMT', 'CMCSA', 'HD', 'DIS', 'MCD', 'CHTR', 'UPS', 'PCLN', 'NEE', 'DUK', 'D',
+                  'SO', 'NGG', 'AEP', 'PCG', 'EXC', 'SRE', 'PPL', 'IEP', 'HRG', 'CODI', 'REX', 'SPLP', 'PICO', 'AGFS',
+                  'BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA', 'GE', 'MMM', 'BA', 'HON', 'UTX',
+                  'LMT', 'CAT', 'GD', 'DHR', 'ABB', 'GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC',
+                  'CSCO']
+all_tickers = [i.lower() for i in ticker_folders]
 
 # Add space at the beginning and end to make it properly tokenized 
 DELIMITER = ' SEP '
