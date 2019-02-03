@@ -72,6 +72,7 @@ def interp(df, timecol, asset, val):
         rowIndex = new_df[new_df[timecol]== value].index[0]
         new_df.loc[rowIndex,asset] = df[val].iloc[i]
     return new_df
+
 def shift_asset_sensitive(df, assetName, value, timecol):
 #    df = shift_asset(df, headline)[3:]
     #df is sorted by asset and time.
@@ -130,13 +131,15 @@ def main():
     newsdf = shift_asset_sensitive(news_dataframe,'assetName','headline','time')
     mktdf = shift_asset_sensitive(mkt_dataframe,'assetName','close','time')
     mkt_dataframe = create_label(mktdf,'close', 'closePast1', 'label')
-   #merge file
-    merged = mergedf(newsdf, mkt_dataframe, ['time', 'assetName'])
-    
-    #remove nan rows
-    merged = elim_rows(merged)
-    merged.to_csv('sampleTest.csv', index=False)   
-    
+    # print(mkt_dataframe)
+    #merge file
+    if newsdf is not None and mkt_dataframe is not None:
+        merged = mergedf(newsdf, mkt_dataframe, ['time', 'assetName'])
+        #remove nan rows
+        merged = elim_rows(merged)
+        merged.to_csv('sampleTest.csv', index=False)
+    else:
+        raise TypeError("Insufficient market or news data")
 
 if __name__=="__main__":
     main()
