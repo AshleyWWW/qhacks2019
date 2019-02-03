@@ -56,7 +56,6 @@ def time_to_string(ns):
 def string_to_ns(time):
     dt_obj = datetime.strptime(time, '%Y-%m-%d')
     nanosec = dt_obj.timestamp() * 1000000000
-#    print(nanosec)
     return int(nanosec)
 
 def interp(df, timecol, asset, val):
@@ -75,18 +74,12 @@ def interp(df, timecol, asset, val):
     return new_df
 
 def shift_asset_sensitive(df, assetName, value, timecol):
-#    df = shift_asset(df, headline)[3:]
     #df is sorted by asset and time.
     assets = list(pd.unique(df[assetName]))
-#    g = df.groupby(['assetName'], as_index=False)
-#    print(g.groups.keys())
     bigdata=None
     for asset in assets:
-#        print(asset)
         new_df = df[ df[assetName] == asset]
         if (new_df.shape[0]) > 3:
-#            data1 = interp(new_df, 'time', asset, 'headline')
-#            print(data1)
             data1 = interpolate_days(new_df, timecol)
             if bigdata is None:
                 bigdata = shift(data1, value)[3:]
@@ -95,7 +88,6 @@ def shift_asset_sensitive(df, assetName, value, timecol):
                 bigdata = bigdata.append(data1, ignore_index=True)
         else:
             continue
-#    bigdata.to_csv('test.csv', index=False)        
     return bigdata
 
 def create_label(dff, current, previous, label):
@@ -132,7 +124,7 @@ def main():
     newsdf = shift_asset_sensitive(news_dataframe,'assetName','headline','time')
     mktdf = shift_asset_sensitive(mkt_dataframe,'assetName','close','time')
     mkt_dataframe = create_label(mktdf,'close', 'closePast1', 'label')
-    # print(mkt_dataframe)
+
     #merge file
     if newsdf is not None and mkt_dataframe is not None:
         merged = mergedf(newsdf, mkt_dataframe, ['time', 'assetName'])
