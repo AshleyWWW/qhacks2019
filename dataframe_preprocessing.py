@@ -2,7 +2,6 @@
 """
 Spyder Editor
 
-This is a temporary script file.
 """
 import datetime
 import pandas as pd
@@ -73,14 +72,14 @@ def interp(df, timecol, asset, val):
         new_df.loc[rowIndex,asset] = df[val].iloc[i]
     return new_df
 
-def shift_asset_sensitive(df, assetName, value, timecol):
+def shift_asset_sensitive(df, assetName, value, timecol,chunksize):
     #df is sorted by asset and time.
     assets = list(pd.unique(df[assetName]))
     bigdata=None
     for asset in assets:
         new_df = df[ df[assetName] == asset]
-        if (new_df.shape[0]) > 3:
-            data1 = interpolate_days(new_df, timecol)
+        if (new_df.shape[0]) > chunksize:
+            data1 = interpolate_days(new_df, timecol, asset, assetName)
             if bigdata is None:
                 bigdata = shift(data1, value)[3:]
             else:
@@ -101,11 +100,14 @@ def create_label(dff, current, previous, label):
             dff[label].iloc[i] = 1
     return dff
 
-def interpolate_days(dff, dates):
+def interpolate_days(dff, dates, asset, assetName):
     span = pd.date_range(dff[dates].min(), dff[dates].max(), freq="D")
     expanded = pd.DataFrame(index=span.copy()).interpolate("time", columns=dates)
     expanded[dates] = expanded.index
-    return pd.merge(dff, expanded, how="outer", on=[dates], sort=True )
+    df = pd.merge(dff, expanded, how="outer", on=[dates], sort=True )
+#    print(df)
+    df[assetName] = asset
+    return df
     
 def main():
     #read csv files
@@ -119,17 +121,25 @@ def main():
     #concatenate strings and sort by asset and time
     news_dataframe = combine_strings(news_dataframe, 'time', 'assetName', 'headline')
     news_dataframe = assetsort(news_dataframe, 'assetName', 'time')
+    mkt_dataframe = assetsort(mkt_dataframe, 'assetName', 'time')
 
     #interpolate time column in each dataframe 
-    newsdf = shift_asset_sensitive(news_dataframe,'assetName','headline','time')
-    mktdf = shift_asset_sensitive(mkt_dataframe,'assetName','close','time')
+    newsdf = shift_asset_sensitive(news_dataframe,'assetName','headline','time',3)
+    mktdf = shift_asset_sensitive(mkt_dataframe,'assetName','close','time',1)
+    
     mkt_dataframe = create_label(mktdf,'close', 'closePast1', 'label')
-
+    
     #merge file
     if newsdf is not None and mkt_dataframe is not None:
         merged = mergedf(newsdf, mkt_dataframe, ['time', 'assetName'])
+        print(merged[['headlinePast1', 'headlinePast2']])
         #remove nan rows
         merged = elim_rows(merged, "label", "assetName")
+        del merged['closePast1']
+        del merged['closePast2']
+        del merged['closePast3']
+        del merged['headline']
+        del merged['close']
         merged.to_csv('sampleTest.csv', index=False)
     else:
         raise TypeError("Insufficient market or news data")
